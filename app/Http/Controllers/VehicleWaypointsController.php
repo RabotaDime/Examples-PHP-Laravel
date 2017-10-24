@@ -26,20 +26,45 @@ class VehicleWaypointsController extends Controller
 		///  Идентификатор виртуального хранилища. 
 		$StorageDisk = 'local';
 
+		///  Максимальный размер записи.
+		$FileRecordMaximumLength = 1000;
 
-		if ($request->hasFile($FileID))
+
+/*
+		///  Максимальный размер файла CSV = 50 МБ.
+		$FileMaxSize = 50 * 1024 * 1024;
+
+		$ValidateData = $R->validate([
+			"$FileID" => "required|size:$FileMaxSize",
+		]);
+*/
+
+
+		if ($R->hasFile($FileID))
 		{
-			//return "File is here";
-
 			$DataFile = $R->file($FileID);
-			$InputFileTempLocation = '/temp1.jpeg';
 
+			$RecordsCount = -1;
+
+			if (($InputStream = fopen($DataFile, 'r+')) !== false)
+			{
+				$RecordsCount = 0;
+
+				while (($FileRecord = fgetcsv($InputStream, $FileRecordMaximumLength, ";")) !== false)
+				{
+					$RecordsCount++;
+				}
+			}
+
+/*
 			///   Сохраняю входящий файл с помощью потоковой записи. 
 			///   Используется стандартный класс "Storage". 
+			$InputFileTempLocation = '/temp1.jpeg';
 			$VirtualStorage = Storage::disk($StorageDisk);
 			$VirtualStorage->put($InputFileTempLocation, fopen($DataFile, 'r+'));
-
 			return "File saved correctly.";
+*/
+			return "File was imported correctly. Number of records = " . $RecordsCount;
 		}
 		else 
 		{

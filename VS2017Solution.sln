@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{37804034-1A4D-4B5B-B7D0-C2D3906D858F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{CF02F7A0-9578-4669-88D1-E42657C81F47}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Http", "Http", "{F6F89192-DE44-4073-8D9C-CEF18DF67A38}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controllers", "Controllers", "{75C1CA8F-85F7-4EDC-94E3-CE8C94F19305}"
+	ProjectSection(SolutionItems) = preProject
+		app\Http\Controllers\UsersController.php = app\Http\Controllers\UsersController.php
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "routes", "routes", "{53B504C3-E928-4765-A421-6F3819EADDDA}"
+	ProjectSection(SolutionItems) = preProject
+		routes\web.php = routes\web.php
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{E3F354BB-66F5-494F-9356-25AE8FAF5798}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "views", "views", "{6E96C297-1F36-4753-93C8-734EBB40D24A}"
+	ProjectSection(SolutionItems) = preProject
+		resources\views\welcome.blade.php = resources\views\welcome.blade.php
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CF02F7A0-9578-4669-88D1-E42657C81F47} = {37804034-1A4D-4B5B-B7D0-C2D3906D858F}
+		{F6F89192-DE44-4073-8D9C-CEF18DF67A38} = {CF02F7A0-9578-4669-88D1-E42657C81F47}
+		{75C1CA8F-85F7-4EDC-94E3-CE8C94F19305} = {F6F89192-DE44-4073-8D9C-CEF18DF67A38}
+		{53B504C3-E928-4765-A421-6F3819EADDDA} = {37804034-1A4D-4B5B-B7D0-C2D3906D858F}
+		{E3F354BB-66F5-494F-9356-25AE8FAF5798} = {37804034-1A4D-4B5B-B7D0-C2D3906D858F}
+		{6E96C297-1F36-4753-93C8-734EBB40D24A} = {E3F354BB-66F5-494F-9356-25AE8FAF5798}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A1D6179C-05C7-4730-AA87-182D22033981}
+	EndGlobalSection
+EndGlobal

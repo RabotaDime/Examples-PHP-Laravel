@@ -11,27 +11,27 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::domain('api.waypoints.ru')->prefix('vehicles')->middleware('auth')->group(function () {
+
+	///   REST API: Вывод данных по выбранному пути. 
+	Route::get    ('{vehicle_id}/routes/{route_id}', 'VehicleWaypointsController@api_show')->
+				  where([
+				      'vehicle_id'	=> '[0-9]+',
+					  'route_id'	=> '[0-9]+'
+				  ]);
+
+	Route::post   ('{vehicle_id}/routes/create', [
+						'uses'	=> 'VehicleWaypointsController@import',
+						'as'	=> 'vehicles.routes.import'
+					]);
+
 });
 
-Route::get		('users'			, ['uses' => 'UsersController@index']);
-Route::get		('users/create'		, ['uses' => 'UsersController@create']);
-Route::post		('users'			, ['uses' => 'UsersController@store']);
+Route::domain('waypoints.ru')->prefix('vehicles')->middleware('auth')->group(function () {
 
-Route::get		('vehicles/routes', [
-					'uses'	=> 'VehicleWaypointsController@index',
-					'as'	=> 'vehicles.routes.index'
-				]);
-
-Route::post		('vehicles/routes', [
-					'uses'	=> 'VehicleWaypointsController@import',
-					'as'	=> 'vehicles.routes.import'
-				]);
-
-Auth::routes();
-
-Route::prefix('vehicles')->middleware('auth')->group(function () {
+	Route::get('/', function () {
+		return view('welcome');
+	});
 
 	///   Web: Просмотр выбранного пути. 
 	Route::get	  ('{vehicle_id}/routes/{route_id}', 'VehicleWaypointsController@show')->
@@ -40,16 +40,22 @@ Route::prefix('vehicles')->middleware('auth')->group(function () {
 					  'route_id'	=> '[0-9]+'
 				  ]);
 
-});
+	Route::get	  ('users'			, ['uses' => 'UsersController@index']);
+	Route::get	  ('users/create'	, ['uses' => 'UsersController@create']);
+	Route::post	  ('users'			, ['uses' => 'UsersController@store']);
 
-Route::prefix('api/vehicles')->middleware('auth')->group(function () {
-
-	///   REST API: Вывод данных по выбранному пути. 
-	Route::get	  ('{vehicle_id}/routes/{route_id}', 'VehicleWaypointsController@api_show')->
-				  where([
-				      'vehicle_id'	=> '[0-9]+',
-					  'route_id'	=> '[0-9]+'
-				  ]);
+	Route::get	  ('home', 'HomeController@index')->name('home');
 
 });
+
+
+Auth::routes();
+
+
+/*
+Route::get		('vehicles/routes', [
+					'uses'	=> 'VehicleWaypointsController@index',
+					'as'	=> 'vehicles.routes.index'
+				]);
+*/
 

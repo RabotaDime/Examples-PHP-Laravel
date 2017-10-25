@@ -3,16 +3,18 @@
     "",
     "\\app",
     "\\app\\Http",
+    "\\app\\Http\\Controllers",
+    "\\app\\MyCode",
+    "\\app\\Providers",
     "\\config",
-    "\\database",
-    "\\database\\migrations",
     "\\resources",
     "\\resources\\views",
-    "\\resources\\views\\vehicles",
-    "\\resources\\views\\vehicles\\routes",
-    "\\routes",
+    "\\resources\\views\\admin",
+    "\\resources\\views\\admin\\users",
     "\\storage",
-    "\\storage\\app"
+    "\\storage\\app",
+    "\\storage\\app\\public"
   ],
+  "SelectedNode": "\\app\\MyCode\\MyCustomClasses.php",
   "PreviewInSolutionExplorer": false
 }

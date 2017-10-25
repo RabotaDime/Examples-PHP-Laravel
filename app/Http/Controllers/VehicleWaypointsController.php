@@ -26,10 +26,12 @@ class VehicleWaypointsController extends Controller
 
 	public function show ($vehicle_id, $route_id)
 	{
+		return "Web show";
 	}
 
-	public function api_show ($vehicle_id, $route_id)
+	public function api_show (Request $aR, $vehicle_id, $route_id)
 	{
+		return "API show $vehicle_id + $route_id";
 	}
 
 

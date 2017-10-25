@@ -9,16 +9,16 @@ class UsersController extends Controller
     public function index ()
     {
         $TestJSON_MyUsers = [
-                '0' => [
-                        'first_name' => 'Anatoly',
-                        'last_name' => 'Karpov',
-                        'location' => 'Kazakstan'
-                ],
-                '1' => [
-                        'first_name' => 'Arnold',
-                        'last_name' => 'Shvartcnigger',
-                        'location' => 'USA'
-                ]
+            '0' => [
+                    'first_name' => 'Anatoly',
+                    'last_name' => 'Karpov',
+                    'location' => 'Kazakstan'
+            ],
+            '1' => [
+                    'first_name' => 'Arnold',
+                    'last_name' => 'Shvartcnigger',
+                    'location' => 'USA'
+            ]
         ];
 
         //return $TestJSON_MyUsers;

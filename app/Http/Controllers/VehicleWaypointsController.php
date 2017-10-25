@@ -3,12 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+
+use App\MyCode\CSVTrackingJobFile;
+use App\MyCode\CSVTrackingJobHelper;
+use App\MyCode\DebugCSVConsumer;
 
 
 
 class VehicleWaypointsController extends Controller
 {
+		///  Идентификатор входящего загружаемого файла. 
+	public const ImportCSVFileID = 'datafile';
+
+
+
 	public function index ()
 	{
 		return view('vehicles.routes.index');
@@ -16,21 +24,21 @@ class VehicleWaypointsController extends Controller
 
 
 
-    public function import (Request $request)
+	public function show ($vehicle_id, $route_id)
 	{
-		$R = $request; //dd($R->all());
+	}
 
-		///  Идентификатор входящего загружаемого файла. 
-		$FileID = 'datafile';
-
-		///  Идентификатор виртуального хранилища. 
-		$StorageDisk = 'local';
-
-		///  Максимальный размер записи.
-		$FileRecordMaximumLength = 1000;
+	public function api_show ($vehicle_id, $route_id)
+	{
+	}
 
 
+
+    public function import (Request $aR)
+	{
 /*
+		dd($aR->all());
+
 		///  Максимальный размер файла CSV = 50 МБ.
 		$FileMaxSize = 50 * 1024 * 1024;
 
@@ -39,36 +47,40 @@ class VehicleWaypointsController extends Controller
 		]);
 */
 
+		$ImportConsumer = new DebugCSVConsumer();
 
-		if ($R->hasFile($FileID))
+		try
 		{
-			$DataFile = $R->file($FileID);
-
-			$RecordsCount = -1;
-
-			if (($InputStream = fopen($DataFile, 'r+')) !== false)
-			{
-				$RecordsCount = 0;
-
-				while (($FileRecord = fgetcsv($InputStream, $FileRecordMaximumLength, ";")) !== false)
-				{
-					$RecordsCount++;
-				}
-			}
-
-/*
-			///   Сохраняю входящий файл с помощью потоковой записи. 
-			///   Используется стандартный класс "Storage". 
-			$InputFileTempLocation = '/temp1.jpeg';
-			$VirtualStorage = Storage::disk($StorageDisk);
-			$VirtualStorage->put($InputFileTempLocation, fopen($DataFile, 'r+'));
-			return "File saved correctly.";
-*/
-			return "File was imported correctly. Number of records = " . $RecordsCount;
+			$ImportResult = CSVTrackingJobHelper::ProcessRequest($aR, self::ImportCSVFileID, $ImportConsumer);
+			$ImportErrorMessage = '';
 		}
-		else 
+		catch (Exception $E)
 		{
-			return "Error. File not found!";
+			$ImportErrorMessage = "Error: \"$E->getMessage\"";
+		}
+
+
+		if ($ImportResult >= 0)
+		{
+			return [
+				'ImportResult' => [
+					'ErrorCode'			=> 0,
+					'Message'			=> 'Successful import operation.',
+					'RecordsReaded'		=> $ImportResult,
+					'RecordsAdded'		=> $ImportConsumer->GetCount(),
+				]
+            ];
+		}
+		else
+		{
+			return [
+				'ImportResult' => [
+					'ErrorCode'			=> $ImportResult,
+					'Message'			=> 'Import operation failed. ' . $ImportErrorMessage,
+					'RecordsReaded'		=> 0,
+					'RecordsAdded'		=> 0,
+				]
+            ];
 		}
 	}
 }

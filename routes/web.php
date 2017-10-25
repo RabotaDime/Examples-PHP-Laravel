@@ -29,3 +29,27 @@ Route::post		('vehicles/routes', [
 					'as'	=> 'vehicles.routes.import'
 				]);
 
+Auth::routes();
+
+Route::prefix('vehicles')->middleware('auth')->group(function () {
+
+	///   Web: Просмотр выбранного пути. 
+	Route::get	  ('{vehicle_id}/routes/{route_id}', 'VehicleWaypointsController@show')->
+				  where([
+				      'vehicle_id'	=> '[0-9]+',
+					  'route_id'	=> '[0-9]+'
+				  ]);
+
+});
+
+Route::prefix('api/vehicles')->middleware('auth')->group(function () {
+
+	///   REST API: Вывод данных по выбранному пути. 
+	Route::get	  ('{vehicle_id}/routes/{route_id}', 'VehicleWaypointsController@api_show')->
+				  where([
+				      'vehicle_id'	=> '[0-9]+',
+					  'route_id'	=> '[0-9]+'
+				  ]);
+
+});
+

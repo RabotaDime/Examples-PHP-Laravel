@@ -4,17 +4,13 @@
     "\\app",
     "\\app\\Http",
     "\\app\\Http\\Controllers",
-    "\\app\\MyCode",
-    "\\app\\Providers",
-    "\\config",
+    "\\database",
+    "\\database\\migrations",
     "\\resources",
     "\\resources\\views",
-    "\\resources\\views\\admin",
-    "\\resources\\views\\admin\\users",
-    "\\storage",
-    "\\storage\\app",
-    "\\storage\\app\\public"
+    "\\tests\\Feature",
+    "\\tests\\Unit"
   ],
-  "SelectedNode": "\\app\\MyCode\\MyCustomClasses.php",
+  "SelectedNode": "\\database\\migrations\\2017_10_26_160003_create_vehicles_waypoints_table.php",
   "PreviewInSolutionExplorer": false
 }

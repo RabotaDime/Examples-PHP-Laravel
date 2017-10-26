@@ -11,7 +11,12 @@
 |
 */
 
-Route::domain('api.waypoints.ru')->prefix('vehicles')->middleware('auth')->group(function () {
+$SiteBaseAddress = 'waypoints.test';
+
+
+
+Route::domain('api.' . $SiteBaseAddress)->prefix('vehicles')->middleware('auth')->group(function ()
+{
 
 	///   REST API: Вывод данных по выбранному пути. 
 	Route::get    ('{vehicle_id}/routes/{route_id}', 'VehicleWaypointsController@api_show')->
@@ -27,11 +32,8 @@ Route::domain('api.waypoints.ru')->prefix('vehicles')->middleware('auth')->group
 
 });
 
-Route::domain('waypoints.ru')->prefix('vehicles')->middleware('auth')->group(function () {
-
-	Route::get('/', function () {
-		return view('welcome');
-	});
+Route::domain($SiteBaseAddress)->prefix('vehicles')->middleware('auth')->group(function ()
+{
 
 	///   Web: Просмотр выбранного пути. 
 	Route::get	  ('{vehicle_id}/routes/{route_id}', 'VehicleWaypointsController@show')->
@@ -44,8 +46,13 @@ Route::domain('waypoints.ru')->prefix('vehicles')->middleware('auth')->group(fun
 	Route::get	  ('users/create'	, ['uses' => 'UsersController@create']);
 	Route::post	  ('users'			, ['uses' => 'UsersController@store']);
 
-	Route::get	  ('home', 'HomeController@index')->name('home');
+/*
+	Route::get('/', function () {
+		return view('welcome');
+	});
 
+	Route::get	  ('home', 'HomeController@index')->name('home');
+*/
 });
 
 

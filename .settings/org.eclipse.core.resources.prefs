@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//app/Http/Controllers/VehicleWaypointsController.php=UTF-8
+encoding//app/MyCode/MyCustomClasses.php=UTF-8
+encoding//app/MyCode/WaypointsDatabase/Vehicle.MyModel.php=UTF-8
+encoding//app/MyCode/WaypointsDatabase/VehiclesRoute.MyModel.php=UTF-8
+encoding//app/MyCode/WaypointsDatabase/VehiclesType.MyModel.php=UTF-8
+encoding//app/MyCode/WaypointsDatabase/VehiclesWaypoint.MyModel.php=UTF-8
+encoding//app/Providers/AppServiceProvider.php=UTF-8
+encoding//app/VehicleModel.php=UTF-8
+encoding//app/VehiclesWaypointModel.php=UTF-8

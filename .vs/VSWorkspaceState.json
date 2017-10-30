@@ -3,14 +3,14 @@
     "",
     "\\app",
     "\\app\\Http",
-    "\\app\\Http\\Controllers",
     "\\database",
+    "\\database\\factories",
     "\\database\\migrations",
-    "\\resources",
-    "\\resources\\views",
+    "\\database\\seeds",
+    "\\tests",
     "\\tests\\Feature",
     "\\tests\\Unit"
   ],
-  "SelectedNode": "\\database\\migrations\\2017_10_26_160003_create_vehicles_waypoints_table.php",
+  "SelectedNode": "\\resources",
   "PreviewInSolutionExplorer": false
 }

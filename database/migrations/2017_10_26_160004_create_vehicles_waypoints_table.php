@@ -4,11 +4,11 @@
 //use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-use App\My\WaypointsAPI\Data\Vehicle as Data;
+use App\My\WaypointsAPI\Data\VehiclesWaypoint as Data;
 
 
 
-class CreateVehiclesTable extends Migration
+class CreateVehiclesWaypointsTable extends Migration
 {
     /**
      * Run the migrations.

@@ -11,6 +11,11 @@
 |
 */
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
+
+
 $SiteBaseAddress = 'waypoints.test';
 
 
@@ -46,6 +51,7 @@ Route::domain($SiteBaseAddress)->prefix('vehicles')->middleware('auth')->group(f
 	Route::get	  ('users/create'	, ['uses' => 'UsersController@create']);
 	Route::post	  ('users'			, ['uses' => 'UsersController@store']);
 
+
 /*
 	Route::get('/', function () {
 		return view('welcome');
@@ -53,6 +59,14 @@ Route::domain($SiteBaseAddress)->prefix('vehicles')->middleware('auth')->group(f
 
 	Route::get	  ('home', 'HomeController@index')->name('home');
 */
+});
+
+
+Route::domain($SiteBaseAddress)->middleware('auth')->group(function ()
+{
+	
+	Route::get		('/', 'VehicleWaypointsController@home')->name('home');
+
 });
 
 

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Exception;
 
-use App\MyCode\CSVTrackingJobFile;
+//use App\MyCode\CSVTrackingJobFile;
 use App\MyCode\CSVTrackingJobHelper;
 use App\MyCode\DebugCSVConsumer;
 
@@ -12,21 +14,21 @@ use App\MyCode\DebugCSVConsumer;
 
 class VehicleWaypointsController extends Controller
 {
-		///  Èäåíòèôèêàòîğ âõîäÿùåãî çàãğóæàåìîãî ôàéëà. 
+		///  Ğ˜Ğ´ĞµĞ½Ñ‚Ğ¸Ñ„Ğ¸ĞºĞ°Ñ‚Ğ¾Ñ€ Ğ²Ñ…Ğ¾Ğ´ÑÑ‰ĞµĞ³Ğ¾ Ğ·Ğ°Ğ³Ñ€ÑƒĞ¶Ğ°ĞµĞ¼Ğ¾Ğ³Ğ¾ Ñ„Ğ°Ğ¹Ğ»Ğ°. 
 	public const ImportCSVFileID = 'datafile';
 
 
 
-	public function index ()
+	public function home ()
 	{
-		return view('vehicles.routes.index');
+		return view('vehicles.index');
 	}
 
 
 
 	public function show ($vehicle_id, $route_id)
 	{
-		return "Web show";
+		return view('vehicles.routes.show');
 	}
 
 	public function api_show (Request $aR, $vehicle_id, $route_id)
@@ -41,7 +43,7 @@ class VehicleWaypointsController extends Controller
 /*
 		dd($aR->all());
 
-		///  Ìàêñèìàëüíûé ğàçìåğ ôàéëà CSV = 50 ÌÁ.
+		///  ĞœĞ°ĞºÑĞ¸Ğ¼Ğ°Ğ»ÑŒĞ½Ñ‹Ğ¹ Ñ€Ğ°Ğ·Ğ¼ĞµÑ€ Ñ„Ğ°Ğ¹Ğ»Ğ° CSV = 50 ĞœĞ‘.
 		$FileMaxSize = 50 * 1024 * 1024;
 
 		$ValidateData = $R->validate([

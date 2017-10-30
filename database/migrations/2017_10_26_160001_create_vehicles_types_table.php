@@ -1,8 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+//use Illuminate\Support\Facades\Schema;
+//use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+
+use App\My\WaypointsAPI\Data	\VehiclesType as Data;
+
+
 
 class CreateVehiclesTypesTable extends Migration
 {
@@ -13,21 +17,7 @@ class CreateVehiclesTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('api_vehicletypes', function (Blueprint $table) {
-
-            $table->increments	('ID');
-
-			$table->string		('ModelName');
-			$table->string		('BrandName');
-			$table->string		('Description');
-			$table->integer		('VehicleClass');
-			$table->integer		('EngineVolume');
-			$table->integer		('ServicePeriod');
-			$table->float		('MaxSpeed', 8, 3);
-
-            //$table->timestamps();
-
-        });
+    	Data::ExecuteMigration();
     }
 
     /**
@@ -37,7 +27,7 @@ class CreateVehiclesTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('api_vehicletypes');
+    	Data::ReverseMigration();
     }
 }
 

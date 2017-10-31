@@ -8,3 +8,5 @@ encoding//app/MyCode/WaypointsDatabase/VehiclesWaypoint.MyModel.php=UTF-8
 encoding//app/Providers/AppServiceProvider.php=UTF-8
 encoding//app/VehicleModel.php=UTF-8
 encoding//app/VehiclesWaypointModel.php=UTF-8
+encoding//resources/views/vehicles/index.blade.php=UTF-8
+encoding//resources/views/vehicles/routes/import.blade.php=UTF-8

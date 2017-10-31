@@ -2,56 +2,74 @@
 
 
 
-///                                                                                                 
+///                                                                                            
+///   Статичное описание модели данных, чтобы не использовать строки, которые 
+///   гораздо труднее заменять автозаменой в случае изменения модели данных. 
+///____________________________________________________________________________________________
+///                                                                                            
 ///   Точка пути. 
-///_________________________________________________________________________________________________
+///____________________________________________________________________________________________
 
-namespace App\My\WaypointsAPI\ID { class VehiclesWaypoint extends Source
-{
-	public const Name = 'vehicles'.'waypoints';
-	public const Table = API::DatabasePrefix . self::Name;
-
-	public const RouteID		= 'RouteID';
-	public const Time			= 'Time';
-	public const Speed			= 'Speed';
-	public const Coord			= 'Coord';
-	public const CoordXLng		= 'CoordXLng';
-	public const CoordYLat		= 'CoordYLat';
-
-	public const RouteID_Key		= VehiclesRoute::ID;
-	public const RouteID_Source		= VehiclesRoute::Table;
-}}
+///   Дополнительное описание модели, чтобы в столбцах базы данных были комментарии, а также
+///   чтобы сразу понимать, какие поля за что отвечают, и в каких они единицах измерения. 
 
 namespace App\My\WaypointsAPI\Info { class VehiclesWaypoint
 {
-	public const Speed			= 'Speed';
+	public const Speed	= 'Speed (km/h)'; ///   TODO: Уточнить, описывают ли CSV данные скорость в километрах. 
 }}
-
-
 
 namespace App\My\WaypointsAPI\Data
 {
+	use Illuminate\Support\Facades\DB;
 	use Illuminate\Support\Facades\Schema;
 	use Illuminate\Database\Schema\Blueprint;
 	use Faker\Generator as Faker;
 
-	use App\My\WaypointsAPI\ID		\VehiclesWaypoint as ID;
-	//use App\My\WaypointsAPI\Info	\VehiclesWaypoint as Info;
+	use App\My\DBSpatialHelper;
+
+	use App\My\WaypointsAPI\Info	\VehiclesWaypoint as Info;
 
 
 
 	class VehiclesWaypoint extends StructureSource
 	{
+		public const Name = 'vehicles'.'waypoints';
+		public const Table = self::DatabasePrefix . self::Name;
+	
+		public const RouteID		= 'RouteID';
+		public const Time			= 'Time';
+		public const Speed			= 'Speed';
+		public const Coord			= 'Coord';
+		public const CoordXLng		= 'CoordXLng';
+		public const CoordYLat		= 'CoordYLat';
+	
+		public const RouteID_Key		= VehiclesRoute::ID;
+		public const RouteID_Source		= VehiclesRoute::Table;
+
+
+
+		///   Повтор элементов с прямым обращением к таблице (для уточнения в Join запросах и т. д.) 
+		public const Table_ALL				= self::Table .'.*';
+		public const Table_ID				= self::Table .'.'. self::ID;
+		public const Table_RouteID			= self::Table .'.'. self::RouteID;
+		public const Table_Time				= self::Table .'.'. self::Time;
+		public const Table_Speed			= self::Table .'.'. self::Speed;
+		public const Table_Coord			= self::Table .'.'. self::Coord;
+		public const Table_CoordXLng		= self::Table .'.'. self::CoordXLng;
+		public const Table_CoordYLat		= self::Table .'.'. self::CoordYLat;
+		
+
+
 		public const UseLaravelTimestamps = false;
 
 		public static function ClearMigration ()
 		{
-			self::ClearTable(ID::Table);
+			self::ClearTable(self::Table);
 		}
 
 		public static function ExecuteMigration ()
 		{
-	        Schema::create(ID::Table, function (Blueprint $table) {
+	        Schema::create(self::Table, function (Blueprint $table) {
 
 				///
 				///  В данном примере я рассматриваю, что это поле не нужно. 
@@ -73,16 +91,16 @@ namespace App\My\WaypointsAPI\Data
 				///  должно хватить на большее число данных. А выборка статических данных
 				///  о пути будет даже проще.
 				///  
-	    		$table->bigIncrements	(ID::ID);
+	    		$table->bigIncrements	(self::ID);
 
-	    		$table->integer			(ID::RouteID)->unsigned();	///  FKEY! 
-	    		$table->dateTime		(ID::Time);
-				$table->float			(ID::Speed, 8, 3);
-	    		$table->point			(ID::Coord);
+	    		$table->integer			(self::RouteID)->unsigned();	///  FKEY! 
+	    		$table->dateTime		(self::Time);
+				$table->float			(self::Speed, 8, 3)->comment(Info::Speed);
+	    		$table->point			(self::Coord);
 	    		//$table->decimal		('CoordXLng', 11, 8);		///  Долгота, Longitude   -180.###### +180.######
 	    		//$table->decimal		('CoordYLat', 10, 8);		///  Широта, (f)Latitude   -90.######  +90.######
 
-	    		$table->foreign			(ID::RouteID)->references(ID::RouteID_Key)->on(ID::RouteID_Source)->onDelete('cascade');
+	    		$table->foreign			(self::RouteID)->references(self::RouteID_Key)->on(self::RouteID_Source)->onDelete('cascade');
 
 
 	            //$table->timestamps();
@@ -92,7 +110,7 @@ namespace App\My\WaypointsAPI\Data
 
 		public static function ReverseMigration ()
 		{
-    		Schema::dropIfExists(ID::Table);
+    		Schema::dropIfExists(self::Table);
 		}
 
 		public static function CreateFactoryFunction ()
@@ -104,21 +122,22 @@ namespace App\My\WaypointsAPI\Data
 		{
 			return self::Specify($SpecifyThis,
 			[
-				ID::ID			=> abs($F->randomNumber()),//abs($F->unique()->randomNumber()),
+				self::ID			=> abs($F->randomNumber()),//abs($F->unique()->randomNumber()),
 
-				ID::Time		=> $F->dateTimeBetween('-5 years', '+0 days'),
-				ID::Speed		=> $F->randomFloat(0, $min = 0.0, $max = 100.0),
+				self::Time		=> $F->dateTimeBetween('-5 years', '+0 days'),
+				self::Speed		=> $F->randomFloat(0, $min = 0.0, $max = 100.0),
 
 								///   Создаю случайную точку пути. 
-				ID::Coord		=> \App\VehiclesWaypoint::MakePoint($F->longitude(), $F->latitude()),
+				self::Coord		=> DB::raw( DBSpatialHelper::MakePointValue($F->longitude(), $F->latitude()) ),
 			]);
 		}
 
 		public const FillableElements =
 		[
-			ID::Time,
-			ID::Speed,
-			ID::Coord,
+			self::RouteID,
+			self::Time,
+			self::Speed,
+			self::Coord,
 		];
 
 		public const HiddenElements =

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\MyCode;
+namespace App\My;
 
 
 

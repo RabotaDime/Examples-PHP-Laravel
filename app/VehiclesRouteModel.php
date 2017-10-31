@@ -4,14 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\My\WaypointsAPI\ID		\VehiclesRoute as ID;
 use App\My\WaypointsAPI\Data	\VehiclesRoute as Data;
 
 
 
 class VehiclesRoute extends Model
 {
-    protected $table = ID::Table;
+    protected $table = Data::Table;
 
 	public $timestamps = Data::UseLaravelTimestamps;
 

@@ -1,18 +1,62 @@
 <?php
 
-namespace App\MyCode;
+namespace App\My;
 
 use DateTime;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+
+use App\My\WaypointsAPI\Data\VehiclesWaypoint as WaypointData;
+
+
+
+class DBSpatialHelper
+{
+	///   РџРѕРјРѕРіР°РµС‚ СЃРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ С‡Р°СЃС‚СЊ С‡РёСЃС‚РѕРіРѕ SQL Р·Р°РїСЂРѕСЃР° РґР»СЏ Spatial-С‚РѕС‡РєРё.                      
+	///____________________________________________________________________________________________
+	///   
+	///   РџСЂРёРјРµСЂ SQL Spatial С‚РѕС‡РєРё РґР»СЏ РјРѕСЃРєРѕРІСЃРєРѕРіРѕ РєСЂРµРјР»СЏ: 
+	///      GeomFromText('POINT(37.617654 55.751234)') 
+	///   
+	///   SRID (SpatialID) СЌС‚Рѕ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РґР»СЏ СѓРєР°Р·Р°РЅРёСЏ СЃРёСЃС‚РµРј РёСЃС‡РёСЃР»РµРЅРёСЏ РіРµРѕРіСЂР°С„РёС‡РµСЃРєРёС… РґР°РЅРЅС‹С…. 
+	///   Р’ РґР°РЅРЅРѕРј СЃР»СѓС‡Р°Рµ, СЏ РёСЃРїРѕР»СЊР·СѓСЋ РѕРґРёРЅ РёР· СЃС‚Р°РЅРґР°СЂС‚РЅС‹С… РґР»СЏ РїСЂРёРјРµСЂР°, С‚Р°Рє РєР°Рє PHPMyAdmin 
+	///   РЅРµ Р»СЋР±РёС‚ РЅСѓР»РµРІРѕРµ Р·РЅР°С‡РµРЅРёРµ, Р° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµС‚РёС„РёРєС‚РѕСЂРѕРј РїРѕРєР°Р·С‹РІР°РµС‚ С‚РѕС‡РєСѓ РЅР° РєР°СЂС‚Рµ 
+	///   РІ СЃРІРѕРµРј РёРЅС‚РµСЂС„РµР№СЃРµ С‡РµСЂРµР· OpenStreetMap (www.openstreetmap.org) 
+	///   
+	public static function MakePointValue (float $XLng, float $YLat, $SpatialID = 4326)
+	{
+		return sprintf("ST_GeomFromText('POINT(%.6f %.6f)',%u)", $XLng, $YLat, $SpatialID);
+	}
+
+	public static function MakeXColumn (string $ColumnID)
+	{
+		return "X('" . $ColumnID . ")";
+	}
+
+	public static function MakeYColumn (string $ColumnID)
+	{
+		return "Y('" . $ColumnID . ")";
+	}
+
+	public static function MakeXColumnAs (string $ColumnID, string $AsID)
+	{
+		return "X('" . $ColumnID . ") as " . $AsID;
+	}
+
+	public static function MakeYColumnAs (string $ColumnID, string $AsID)
+	{
+		return "Y('" . $ColumnID . ") as " . $AsID;
+	}
+}
 
 
 
 class CSVTrackingRecord
 {
 	public /* @var float	*/ $Speed;
-	public /* @var float	*/ $CoordLong;
-	public /* @var float	*/ $CoordFlat;
+	public /* @var float	*/ $CoordXLng;
+	public /* @var float	*/ $CoordYLat;
 	public /* @var DateTime	*/ $DateTime;
 
 	public const EmptyDateTimeString = '0000-00-00 00:00:00';
@@ -42,18 +86,18 @@ class CSVTrackingRecord
 	{
 		$Count = count($aCSVArray);
 
-		///  Извлекаем данные и устанавливаем значения по умолчанию, 
-		///  в случае ошибочных/нулевых данных. 
+		///  РР·РІР»РµРєР°РµРј РґР°РЅРЅС‹Рµ Рё СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ, 
+		///  РІ СЃР»СѓС‡Р°Рµ РѕС€РёР±РѕС‡РЅС‹С…/РЅСѓР»РµРІС‹С… РґР°РЅРЅС‹С…. 
 		$this->DateTime		= null;
 		$this->Speed		= ($Count >= 2) ? floatval($aCSVArray[1]) : 0;
-		$this->CoordLong	= ($Count >= 3) ? floatval($aCSVArray[2]) : 0;
-		$this->CoordFlat	= ($Count >= 4) ? floatval($aCSVArray[3]) : 0;
+		$this->CoordXLng	= ($Count >= 3) ? floatval($aCSVArray[2]) : 0;
+		$this->CoordYLat	= ($Count >= 4) ? floatval($aCSVArray[3]) : 0;
 
-		///  Пытаемся распознать и установить дату. 
+		///  РџС‹С‚Р°РµРјСЃСЏ СЂР°СЃРїРѕР·РЅР°С‚СЊ Рё СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РґР°С‚Сѓ. 
 		$this->SetDateFromString( ($Count >= 1) ? $aCSVArray[0] : self::EmptyDateTimeString );
 
 /*
-		Временная отладка
+		Р’СЂРµРјРµРЅРЅР°СЏ РѕС‚Р»Р°РґРєР°
 		echo '<pre>';
 		var_dump($aCSVArray);
 		echo '</pre>';
@@ -74,16 +118,19 @@ interface ICSVTrackingConsumer
 	public function SetCapacity (int $aSize);
 	public function PushRecord (CSVTrackingRecord $aR);
 	public function GetCount ();
+
+	public function BeginUpdate ();
+	public function EndUpdate ();
 }
 
 
 
 class CSVTrackingJobFile
 {
-	///   Максимальный размер текстовой записи в символах. 
+	///   РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С‚РµРєСЃС‚РѕРІРѕР№ Р·Р°РїРёСЃРё РІ СЃРёРјРІРѕР»Р°С…. 
 	public const MaximumRecordLength = 1000;
 
-	///   Разделитель данных в текстовой записи (один символ). 
+	///   Р Р°Р·РґРµР»РёС‚РµР»СЊ РґР°РЅРЅС‹С… РІ С‚РµРєСЃС‚РѕРІРѕР№ Р·Р°РїРёСЃРё (РѕРґРёРЅ СЃРёРјРІРѕР»). 
 	public const RecordDelimiter = ';';
 
 
@@ -96,14 +143,14 @@ class CSVTrackingJobFile
 
 	public static function IsValidStream ($aFile)
 	{
-		///  Пытаемся узнать тип ресурса, свзяанного с этим файл-указателем. 
+		///  РџС‹С‚Р°РµРјСЃСЏ СѓР·РЅР°С‚СЊ С‚РёРї СЂРµСЃСѓСЂСЃР°, СЃРІР·СЏР°РЅРЅРѕРіРѕ СЃ СЌС‚РёРј С„Р°Р№Р»-СѓРєР°Р·Р°С‚РµР»РµРј. 
 		$ResourceType = get_resource_type($aFile) or
 			die("CSVJobFile :: Unable to validate stream.");
 
 		$ValidTypes = ['file', 'stream'];
 		$ValidFileHandle = false;
 
-		///  Сверяем допустимые типы потоков этого файл-указателя. 
+		///  РЎРІРµСЂСЏРµРј РґРѕРїСѓСЃС‚РёРјС‹Рµ С‚РёРїС‹ РїРѕС‚РѕРєРѕРІ СЌС‚РѕРіРѕ С„Р°Р№Р»-СѓРєР°Р·Р°С‚РµР»СЏ. 
 		foreach ($ValidTypes as $ValidType)
 			if ($ResourceType == $ValidType)
 			{
@@ -113,9 +160,9 @@ class CSVTrackingJobFile
 
 		if
 		(
-			///  Если нам удается получить данные о файл-указателе. 
+			///  Р•СЃР»Рё РЅР°Рј СѓРґР°РµС‚СЃСЏ РїРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ Рѕ С„Р°Р№Р»-СѓРєР°Р·Р°С‚РµР»Рµ. 
 			( ($StatusResult = fstat($aFile)) !== false ) &&
-			///  И если количество связок у этого файл-указателя больше нуля. 
+			///  Р РµСЃР»Рё РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРІСЏР·РѕРє Сѓ СЌС‚РѕРіРѕ С„Р°Р№Р»-СѓРєР°Р·Р°С‚РµР»СЏ Р±РѕР»СЊС€Рµ РЅСѓР»СЏ. 
 			( $StatusResult['nlink'] > 0 )
 		)
 		{
@@ -133,15 +180,15 @@ class CSVTrackingJobFile
 	{
 		if (! self::IsValidStream($aFileStream))
 		{
-			///  Если данный поток не подходит по своему типу, либо является ошибочным. 
+			///  Р•СЃР»Рё РґР°РЅРЅС‹Р№ РїРѕС‚РѕРє РЅРµ РїРѕРґС…РѕРґРёС‚ РїРѕ СЃРІРѕРµРјСѓ С‚РёРїСѓ, Р»РёР±Рѕ СЏРІР»СЏРµС‚СЃСЏ РѕС€РёР±РѕС‡РЅС‹Рј. 
 			return self::InvalidStreamResult;
 		}
 
 		if
 		(
-			///  Если указан недопустимый объект
+			///  Р•СЃР»Рё СѓРєР°Р·Р°РЅ РЅРµРґРѕРїСѓСЃС‚РёРјС‹Р№ РѕР±СЉРµРєС‚
 			empty($aConsumer) ||
-			///  Или объект не относится к нужному типу (в PHP 7 эта проверка не нужна)
+			///  РР»Рё РѕР±СЉРµРєС‚ РЅРµ РѕС‚РЅРѕСЃРёС‚СЃСЏ Рє РЅСѓР¶РЅРѕРјСѓ С‚РёРїСѓ (РІ PHP 7 СЌС‚Р° РїСЂРѕРІРµСЂРєР° РЅРµ РЅСѓР¶РЅР°)
 			( !($aConsumer instanceof ICSVTrackingConsumer) )
 		)
 		{
@@ -149,35 +196,43 @@ class CSVTrackingJobFile
 		}
 
 
+		///   РџРѕРґРіРѕС‚РѕРІРєР° РїРѕС‚СЂРµР±РёС‚РµР»СЏ Рє РґРѕР±Р°РІР»РµРЅРёСЋ Р·Р°РїРёСЃРµР№. 
+		$aConsumer->BeginUpdate();
+
 
 		$Record = new CSVTrackingRecord();
 		$RecordsCount = 0;
 
 		while
 		(
-			///  Считываем каждую запись из файла 
+			///  РЎС‡РёС‚С‹РІР°РµРј РєР°Р¶РґСѓСЋ Р·Р°РїРёСЃСЊ РёР· С„Р°Р№Р»Р° 
 			($DataRecord = fgetcsv
 			(
 				$aFileStream,
 				self::MaximumRecordLength,
 				self::RecordDelimiter
 			))
-			///  До тех пор, пока функция не вернет отрицательный результат 
-			///  (из-за достижения конца файла или иной ошибки). 
+			///  Р”Рѕ С‚РµС… РїРѕСЂ, РїРѕРєР° С„СѓРЅРєС†РёСЏ РЅРµ РІРµСЂРЅРµС‚ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Р№ СЂРµР·СѓР»СЊС‚Р°С‚ 
+			///  (РёР·-Р·Р° РґРѕСЃС‚РёР¶РµРЅРёСЏ РєРѕРЅС†Р° С„Р°Р№Р»Р° РёР»Рё РёРЅРѕР№ РѕС€РёР±РєРё). 
 			!== false
 		)
 		{
-			///  Если запись удалось обработать. 
+			///  Р•СЃР»Рё Р·Р°РїРёСЃСЊ СѓРґР°Р»РѕСЃСЊ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ. 
 			if ($Record->AssignFromCSVArray($DataRecord))
 			{
-				///  Передаем данные в Потребитель. 
+				///  РџРµСЂРµРґР°РµРј РґР°РЅРЅС‹Рµ РІ РџРѕС‚СЂРµР±РёС‚РµР»СЊ. 
 				$aConsumer->PushRecord($Record);
-				///  Увеличиваем счетчик извлеченных записей. 
+				///  РЈРІРµР»РёС‡РёРІР°РµРј СЃС‡РµС‚С‡РёРє РёР·РІР»РµС‡РµРЅРЅС‹С… Р·Р°РїРёСЃРµР№. 
 				$RecordsCount++;
 			}
 		}
 
 		unset($Record);
+		
+
+		///   Р—Р°РІРµСЂС€РµРЅРёРµ РїРѕС‚СЂРµР±Р»РµРЅРёСЏ. 
+		$aConsumer->EndUpdate();
+
 
 		return $RecordsCount;
 	}
@@ -187,6 +242,8 @@ class CSVTrackingJobFile
 
 class CSVTrackingJobHelper
 {
+	///  Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РјРµС‚РѕРґ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё РІС…РѕРґСЏС‰РµРіРѕ Р·Р°РїСЂРѕСЃР° (СЃ CSV-С„Р°Р№Р»РѕРј) 
+	///  РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РІ Controller-РєР»Р°СЃСЃР°С…. 
 	public static function ProcessRequest ($aR, $aFileID, ICSVTrackingConsumer $aConsumer)
 	{
 		$RecordsCount = CSVTrackingJobFile::InvalidCountResult;
@@ -206,21 +263,21 @@ class CSVTrackingJobHelper
 
 
 
-	///  Функция для сохранения входящего файла для последующей обработки. 
+	///  Р¤СѓРЅРєС†РёСЏ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ РІС…РѕРґСЏС‰РµРіРѕ С„Р°Р№Р»Р° РґР»СЏ РїРѕСЃР»РµРґСѓСЋС‰РµР№ РѕР±СЂР°Р±РѕС‚РєРё. 
 	public static function StoreRequestFile ($aR, $aFileID)
 	{
 		if ($aR->hasFile($aFileID))
 		{
 			$RequestInputFile = $aR->file($aFileID);
 
-			///  Формируем временное имя файла. 
+			///  Р¤РѕСЂРјРёСЂСѓРµРј РІСЂРµРјРµРЅРЅРѕРµ РёРјСЏ С„Р°Р№Р»Р°. 
 			$TempFileName = uniqid('queued-job-', true) . '.csv';
 
-			///  Идентификатор виртуального хранилища. 
+			///  РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ С…СЂР°РЅРёР»РёС‰Р°. 
 			$StorageDisk = 'local';
 
-			///   Сохраняю входящий файл с помощью записи входящего потока. 
-			///   Используется стандартный класс Laravel "Storage". 
+			///   РЎРѕС…СЂР°РЅСЏСЋ РІС…РѕРґСЏС‰РёР№ С„Р°Р№Р» СЃ РїРѕРјРѕС‰СЊСЋ Р·Р°РїРёСЃРё РІС…РѕРґСЏС‰РµРіРѕ РїРѕС‚РѕРєР°. 
+			///   РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РєР»Р°СЃСЃ Laravel "Storage". 
 			$TempLocation = '/tracking-input-jobs/' . $TempFileName;
 			$VirtualStorage = Storage::disk($StorageDisk);
 			$VirtualStorage->put($TempLocation, fopen($RequestInputFile, 'r+'));
@@ -234,7 +291,8 @@ class CSVTrackingJobHelper
 
 
 
-class DebugCSVConsumer implements ICSVTrackingConsumer
+///   РћС‚Р»Р°РґРѕС‡РЅС‹Р№ РїРѕС‚СЂРµР±РёС‚РµР»СЊ CSV-РґР°РЅРЅС‹С…. 
+class CSVDebugConsumer implements ICSVTrackingConsumer
 {
 	private $Counter = 0;
 
@@ -242,11 +300,145 @@ class DebugCSVConsumer implements ICSVTrackingConsumer
 	{
 	}
 
-	public function PushRecord (CSVTrackingRecord $aR)
+	public function PushRecord (CSVTrackingRecord $R)
 	{
-		if ($aR->DateTime !== null)
+		if ($R->DateTime !== null)
 			$this->Counter++;
 	}
+
+	public function GetCount ()
+	{
+		return $this->Counter;
+	}
+
+	public function BeginUpdate ()
+	{
+	}
+
+	public function EndUpdate ()
+	{
+	}
+}
+
+
+
+///   РћРґРЅР° РёР· СЂРµР°Р»РёР·Р°С†РёР№ РЅР°СЃС‚РѕСЏС‰РµРіРѕ РїРѕС‚СЂРµР±РёС‚РµР»СЏ CSV-РґР°РЅРЅС‹С…. 
+class CSVDatabaseConsumer implements ICSVTrackingConsumer
+{
+	public const DefaultBulkInsertStep = 256;
+
+	private $Counter = 0;
+	private $BufferArray = [];
+
+	private $Worker_RouteID				= 0;
+	private $Worker_BulkInsertCount		= self::DefaultBulkInsertStep;
+	private $Worker_UseBulkInsert		= true;
+
+	private $ExecutionStart;
+	private $ExecutionEnd;
+	public 	$ExecutionTime;
+
+
+
+	public function __construct ($RouteID, $BulkInsertCount = self::DefaultBulkInsertStep, $UseBulkInsert = true)
+	{
+		$this->Worker_RouteID			= $RouteID;
+		$this->Worker_BulkInsertCount	= $BulkInsertCount;
+		$this->Worker_UseBulkInsert		= $UseBulkInsert;
+	}
+
+	
+
+	public function SetCapacity (int $aSize)
+	{
+	}
+	
+
+	public function BeginUpdate ()
+	{
+		DB::connection()->disableQueryLog();
+		
+		$this->ExecutionStart = microtime(true);
+		
+		$this->BufferArray = [];
+	}
+
+	public function EndUpdate ()
+	{
+		$this->BulkInsert();
+
+		$this->ExecutionEnd = microtime(true);
+		$this->ExecutionTime = ($this->ExecutionEnd - $this->ExecutionStart);
+		
+		DB::connection()->enableQueryLog();
+	}
+
+	
+	
+	private function BulkInsert ()
+	{
+		if (!$this->Worker_UseBulkInsert) return;
+
+		if (count($this->BufferArray) <= 0)
+		{
+			return;
+		}
+
+		///   Р”РѕР±Р°РІР»СЏРµРј РІСЃРµ РґР°РЅРЅС‹Рµ РёР· РЅР°РєРѕРїР»РµРЅРЅРѕРіРѕ Р±СѓС„РµСЂР°. 
+		///   Р’РЅРѕСЃРёРј РІ Р±Р°Р·Сѓ РґР°РЅРЅС‹С… РЅРѕРІС‹Рµ С‚РѕС‡РєРё. 
+		$NewPoint = \App\VehiclesWaypoint::insert($this->BufferArray);
+
+		///   РћС‡РёС‰Р°РµРј Р±СѓС„РµСЂ. 
+		$this->BufferArray = [];
+	}
+	
+
+
+	public function PushRecord (CSVTrackingRecord $R)
+	{
+		if (! ($R->DateTime !== null))
+		{
+			return false;
+		}
+		
+		
+		if ($this->Worker_UseBulkInsert)
+		{
+			///   РќР°РїРѕР»РЅРµРЅРёРµ РјР°СЃСЃРёРІР° РґР»СЏ РѕРїРµСЂР°С†РёРё bulk insert. 
+			$this->Counter++;
+			array_push($this->BufferArray,
+			[
+				WaypointData::RouteID	=> $this->Worker_RouteID,
+				WaypointData::Time		=> $R->DateTime,
+				WaypointData::Speed		=> $R->Speed,
+				WaypointData::Coord		=> DB::raw(DBSpatialHelper::MakePointValue(
+												$R->CoordXLng,
+												$R->CoordYLat
+										   )),
+			]);
+
+
+			if (count($this->BufferArray) >= $this->Worker_BulkInsertCount)
+			{
+				$this->BulkInsert();
+			}
+		}
+		else 
+		{
+			\App\VehiclesWaypoint::create
+			([
+				WaypointData::RouteID	=> $this->Worker_RouteID,
+				WaypointData::Time		=> $R->DateTime,
+				WaypointData::Speed		=> $R->Speed,
+				WaypointData::Coord		=> DB::raw(DBSpatialHelper::MakePointValue(
+												$R->CoordXLng,
+												$R->CoordYLat
+										   )),
+			]);
+		}
+	}
+
+
 
 	public function GetCount ()
 	{

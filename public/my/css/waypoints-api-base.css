@@ -1,6 +1,16 @@
+*
+{
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
 .ViewTitleDelimiter {
 	margin: 10px;
 	font-weight: normal !important;
 	color: lightgray;
 }
+
+
+.MyImportForm form	{ margin: 5px 0; border: 0px dashed lightgrey; }
+.MyImportForm input	{ margin: 10px 0; display: block; }
+.MyImportForm h3	{ margin: 30px 0 5px 0; display: block; }
 

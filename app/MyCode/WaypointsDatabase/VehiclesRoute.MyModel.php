@@ -2,27 +2,20 @@
 
 
 
-///                                                                                                 
+///                                                                                            
+///   Статичное описание модели данных, чтобы не использовать строки, которые 
+///   гораздо труднее заменять автозаменой в случае изменения модели данных. 
+///____________________________________________________________________________________________
+///                                                                                            
 ///   Путь. 
 ///_________________________________________________________________________________________________
 
-namespace App\My\WaypointsAPI\ID { class VehiclesRoute extends Source
-{
-	public const Name = 'vehicles'.'routes';
-	public const Table = API::DatabasePrefix . self::Name;
-
-	public const VehicleID		= 'VehicleID';
-	public const Description	= 'Description';
-
-	public const VehicleID_Key		= Vehicle::ID;
-	public const VehicleID_Source	= Vehicle::Table;	
-}}
+///   Дополнительное описание модели, чтобы в столбцах базы данных были комментарии, а также
+///   чтобы сразу понимать, какие поля за что отвечают, и в каких они единицах измерения. 
 
 namespace App\My\WaypointsAPI\Info { class VehiclesRoute
 {
 }}
-
-
 
 namespace App\My\WaypointsAPI\Data
 {
@@ -30,27 +23,45 @@ namespace App\My\WaypointsAPI\Data
 	use Illuminate\Database\Schema\Blueprint;
 	use Faker\Generator as Faker;
 
-	use App\My\WaypointsAPI\ID		\VehiclesRoute as ID;
 	//use App\My\WaypointsAPI\Info	\VehiclesRoute as Info;
 
 
 
 	class VehiclesRoute extends StructureSource
 	{
-		public const UseLaravelTimestamps = false;
+		public const Name = 'vehicles'.'routes';
+		public const Table = self::DatabasePrefix . self::Name;
+	
+		public const VehicleID		= 'VehicleID';
+		public const Description	= 'Description';
+	
+		public const VehicleID_Key		= Vehicle::ID;
+		public const VehicleID_Source	= Vehicle::Table;
+
+
+
+		///   Повтор элементов с прямым обращением к таблице (для уточнения в Join запросах и т. д.) 
+		public const Table_ALL				= self::Table .'.*';
+		public const Table_ID				= self::Table .'.'. self::ID;
+		public const Table_VehicleID		= self::Table .'.'. self::VehicleID;
+		public const Table_Description 		= self::Table .'.'. self::Description;
+
+    
+    
+		public const UseLaravelTimestamps = false; 
 		
 		public static function ExecuteMigration ()
 		{
-	        Schema::create(ID::Table, function (Blueprint $table) {
+	        Schema::create(self::Table, function (Blueprint $table) {
 
-	        	$table->increments	(ID::ID);
+	        	$table->increments	(self::ID);
 
-            	$table->integer		(ID::VehicleID)->unsigned()->nullable(); ///  FKEY! NULL 
-	        	$table->string		(ID::Description);
+            	$table->integer		(self::VehicleID)->unsigned()->nullable(); ///  FKEY! NULL 
+	        	$table->string		(self::Description);
 
-				$table->foreign		(ID::VehicleID)
-									 -> references	(ID::VehicleID_Key)
-									 -> on			(ID::VehicleID_Source);
+				$table->foreign		(self::VehicleID)
+									 -> references	(self::VehicleID_Key)
+									 -> on			(self::VehicleID_Source);
 
 	            //$table->timestamps();
 
@@ -59,12 +70,12 @@ namespace App\My\WaypointsAPI\Data
 			
 		public static function ClearMigration ()
 		{
-			self::ClearTable(ID::Table);
+			self::ClearTable(self::Table);
 		}
 
 		public static function ReverseMigration ()
 		{
-    		Schema::dropIfExists(ID::Table);
+    		Schema::dropIfExists(self::Table);
 		}
 		
 		public static function CreateFactoryFunction ()
@@ -76,17 +87,18 @@ namespace App\My\WaypointsAPI\Data
 		{
 			return self::Specify($SpecifyThis,
 			[
-				ID::ID				=> $F->numberBetween($min = 1, $max = 30),//$F->unique()->numberBetween($min = 1, $max = 30),
+				self::ID				=> $F->numberBetween($min = 1, $max = 30),//$F->unique()->numberBetween($min = 1, $max = 30),
 
-				ID::Description		=> $F->sentence(10),
+				self::Description		=> $F->sentence(10),
 
-				ID::VehicleID		=> factory(\App\Vehicle::class)->make()->ID,
+				self::VehicleID		=> factory(\App\Vehicle::class)->make()->ID,
 			]);
 		}
 
 		public const FillableElements =
 		[
-			ID::Description,
+			self::VehicleID,
+			self::Description,
 		];
 
 		public const HiddenElements =

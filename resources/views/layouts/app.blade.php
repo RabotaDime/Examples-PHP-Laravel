@@ -78,5 +78,6 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('my/js/waypoints-api-base.js') }}"></script>
 </body>
 </html>

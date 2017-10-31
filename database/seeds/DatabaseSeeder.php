@@ -4,15 +4,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use DeepCopy\TypeFilter\Date\DateIntervalFilter;
 
-use App\My\WaypointsAPI\ID\VehiclesType			as ID_VehiclesType;
-use App\My\WaypointsAPI\ID\Vehicle				as ID_Vehicle;
-use App\My\WaypointsAPI\ID\VehiclesRoute		as ID_VehiclesRoute;
-use App\My\WaypointsAPI\ID\VehiclesWaypoint		as ID_VehiclesWaypoint;
-
-use App\My\WaypointsAPI\Data\VehiclesType		as Data_VehiclesType;
-use App\My\WaypointsAPI\Data\Vehicle			as Data_Vehicle;
-use App\My\WaypointsAPI\Data\VehiclesRoute		as Data_VehiclesRoute;
-use App\My\WaypointsAPI\Data\VehiclesWaypoint	as Data_VehiclesWaypoint;
+use App\My\WaypointsAPI\Data\VehiclesType		as VehiclesType;
+use App\My\WaypointsAPI\Data\Vehicle			as Vehicle;
+use App\My\WaypointsAPI\Data\VehiclesRoute		as VehiclesRoute;
+use App\My\WaypointsAPI\Data\VehiclesWaypoint	as VehiclesWaypoint;
 
 
 
@@ -29,10 +24,10 @@ class DatabaseSeeder extends Seeder
 
 
 		///   Очистка данных. 
-		Data_VehiclesWaypoint	::ClearMigration();
-		Data_VehiclesRoute		::ClearMigration();
-		Data_Vehicle			::ClearMigration();
-		Data_VehiclesType		::ClearMigration();
+		VehiclesWaypoint	::ClearMigration();
+		VehiclesRoute		::ClearMigration();
+		Vehicle				::ClearMigration();
+		VehiclesType		::ClearMigration();
 
 
 		///   Создание типов транспортных средств (VehiclesTypes). 
@@ -40,9 +35,9 @@ class DatabaseSeeder extends Seeder
 
 		foreach (range(1, $VehicleTypesCount) as $Index)
 		{
-			App\VehiclesType::create(Data_VehiclesType::CreateFactoryDefinition($F,
+			App\VehiclesType::create(VehiclesType::CreateFactoryDefinition($F,
 			[
-				ID_VehiclesType::ID => $Index,
+				VehiclesType::ID => $Index,
 			]));
 
 			$F->unique(true); 
@@ -57,9 +52,9 @@ class DatabaseSeeder extends Seeder
 
 		foreach (range(1, $VehiclesCount) as $Index)
 		{
-			App\Vehicle::create(Data_Vehicle::CreateFactoryDefinition($F,
+			App\Vehicle::create(Vehicle::CreateFactoryDefinition($F,
 			[
-				ID_Vehicle::ID => $Index,
+				Vehicle::ID => $Index,
 			]));
 
 			$F->unique(true); 
@@ -75,9 +70,9 @@ class DatabaseSeeder extends Seeder
 
 		foreach (range(1, $RoutesCount) as $RouteIndex)
 		{
-			App\VehiclesRoute::create(Data_VehiclesRoute:: CreateFactoryDefinition($F,
+			App\VehiclesRoute::create(VehiclesRoute:: CreateFactoryDefinition($F,
 			[
-				ID_VehiclesRoute::ID => $RouteIndex,
+				VehiclesRoute::ID => $RouteIndex,
 			]));
 
 			$F->unique(true);
@@ -94,7 +89,7 @@ class DatabaseSeeder extends Seeder
 
 				$F2 = Faker\Factory::create();
 
-				App\VehiclesWaypoint::create(Data_VehiclesWaypoint::CreateFactoryDefinition($F2,
+				App\VehiclesWaypoint::create(VehiclesWaypoint::CreateFactoryDefinition($F2,
 				[
 					'ID' => $PointID,
 
